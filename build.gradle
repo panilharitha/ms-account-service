@@ -1,0 +1,56 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '2.5.8'
+	id 'io.spring.dependency-management' version '1.1.0'
+	id "com.avast.gradle.docker-compose" version "0.16.9"
+}
+
+apply plugin: 'docker-compose'
+
+group = 'igd.anz.sample'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '11'
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-hateoas'
+	implementation 'org.flywaydb:flyway-mysql:8.2.1'
+	implementation 'io.springfox:springfox-boot-starter:3.0.0'
+	compileOnly 'org.projectlombok:lombok'
+	runtimeOnly 'mysql:mysql-connector-java'
+	annotationProcessor 'org.projectlombok:lombok'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
+
+dockerCompose {
+	useComposeFiles = ['docker-compose/docker-compose.yml']
+	forceRecreate = true
+}
+
+task startLocalEnvironment {
+	dependsOn += ["composeUp"]
+}
+
+task stopLocalEnvironment {
+	dependsOn += ["composeDown"]
+}
+
+task startSpringBoot(type: GradleBuild) {
+	tasks = ['bootRun']
+}
