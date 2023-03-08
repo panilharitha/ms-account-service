@@ -1,5 +1,8 @@
 package igd.anz.sample.assessment.serviceImpl;
 
+
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
 import igd.anz.sample.assessment.api.AccountResponse;
 import igd.anz.sample.assessment.controller.AccountController;
 import igd.anz.sample.assessment.enums.AccountType;
@@ -11,8 +14,10 @@ import igd.anz.sample.assessment.util.CommonUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+
+import org.mockito.quality.Strictness;
 import org.springframework.hateoas.CollectionModel;
 
 import java.util.Arrays;
@@ -25,8 +30,10 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+import static org.junit.Assert.assertEquals;
 
-@ExtendWith((MockitoExtension.class))
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 public class AccountServiceImplTest {
 
     @Mock
@@ -35,6 +42,7 @@ public class AccountServiceImplTest {
     @Mock
     private AccountMapper accountMapper;
 
+    @InjectMocks
     private AccountServiceImpl accountService;
 
     @BeforeEach
@@ -55,7 +63,10 @@ public class AccountServiceImplTest {
 
         CollectionModel<AccountResponse> response = accountService.getOwnerAccountList("1");
         verify(accountRepository, times(1)).findByUser_UserID(anyLong());
-
+        verify(accountRepository, times(0)).findByAccountId(anyLong());
+        verify(accountMapper, times(1)).maptoAccountResponse(any());
+        assertEquals(response.getContent().stream().findFirst().get().getAccountName(),"Test Account");
+        assertEquals(response.getContent().stream().findFirst().get().getAccountNumber(),"1");
     }
 
     private Account buildAccount(Long accountId, String accountName, String accountNumber, AccountType accountType, Date balanceDate, double opaningBalance, Currency currency){
