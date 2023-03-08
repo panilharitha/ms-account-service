@@ -9,7 +9,7 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserNotFoundException extends RuntimeException{
+public class TransactionNotFoundException extends RuntimeException{
     private static final long serialVersionUID = 1L;
 
     private ApiError apiError;

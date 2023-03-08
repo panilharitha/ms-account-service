@@ -10,8 +10,6 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ApiError {
-
     private String message;
-
     private String errorId;
 }

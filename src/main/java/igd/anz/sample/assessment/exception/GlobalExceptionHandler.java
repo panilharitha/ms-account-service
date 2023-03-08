@@ -16,17 +16,17 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>("Account not found", HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler(value = UserNotFoundException.class)
-    public ResponseEntity<Object> userNotFoundException(AccountNotFoundException exception) {
+    @ExceptionHandler(value = TransactionNotFoundException.class)
+    public ResponseEntity<Object> userNotFoundException(TransactionNotFoundException exception) {
         logException(exception, false);
-        return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>("Transaction not found", HttpStatus.NOT_FOUND);
     }
 
     private void logException(Throwable exception, boolean error){
         if (error) {
             log.error("message:\"Account infor service excountered an exception\", exception=", exception);
         } else {
-            log.info("message:\"Account infor service excountered an exception\", exception=", exception);
+            log.warn("message:\"Account infor service excountered an exception\", exception=", exception);
         }
     }
 }

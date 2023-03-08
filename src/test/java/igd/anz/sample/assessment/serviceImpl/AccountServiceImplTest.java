@@ -58,11 +58,11 @@ public class AccountServiceImplTest {
                 buildAccount(1L,"Test Account", "1", AccountType.SAVINGS, new Date(), 1000.12,
                         Currency.builder().id(1L).name("AUD").build())));
 
-        when(accountRepository.findByUser_UserID(anyLong())).thenReturn(dbReturn);
+        when(accountRepository.findByUser_UserId(anyLong())).thenReturn(dbReturn);
         when(accountMapper.maptoAccountResponse(any(List.class))).thenReturn(mapperReturn);
 
         CollectionModel<AccountResponse> response = accountService.getOwnerAccountList("1");
-        verify(accountRepository, times(1)).findByUser_UserID(anyLong());
+        verify(accountRepository, times(1)).findByUser_UserId(anyLong());
         verify(accountRepository, times(0)).findByAccountId(anyLong());
         verify(accountMapper, times(1)).maptoAccountResponse(any());
         assertEquals(response.getContent().stream().findFirst().get().getAccountName(),"Test Account");

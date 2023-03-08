@@ -4,6 +4,7 @@ import igd.anz.sample.assessment.api.TransactionResponse;
 import igd.anz.sample.assessment.controller.AccountController;
 import igd.anz.sample.assessment.exception.AccountNotFoundException;
 import igd.anz.sample.assessment.exception.ApiError;
+import igd.anz.sample.assessment.exception.TransactionNotFoundException;
 import igd.anz.sample.assessment.mapper.TransactionMapper;
 import igd.anz.sample.assessment.repository.AccountRepository;
 import igd.anz.sample.assessment.repository.TransactionRepository;
@@ -42,11 +43,12 @@ public class TrasactionServiceImpl implements TrasactionService {
         if(account.isPresent()){
 
             List<Transaction> transactions = transactionRepository.findByAccount_AccountId(account.get().getAccountId());
-            if(account.isPresent()){
+            if(account.isPresent() && transactions.size() > 0){
                 return CollectionModel.of(transactionMapper.mapToTransactionResponse(account.get(), transactions), linkTo(methodOn(AccountController.class)
                         .getOwnerAccounts(account.get().getUser().getUserId().toString())).withSelfRel());
             }
+            throw new TransactionNotFoundException(ApiError.builder().message("Transaction not found for given account id").errorId("E003").build());
         }
-        throw new AccountNotFoundException(ApiError.builder().message("Transactions not found for given account id").errorId("E002").build());
+        throw new AccountNotFoundException(ApiError.builder().message("Account not found for given account id").errorId("E002").build());
     }
 }
