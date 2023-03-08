@@ -24,16 +24,21 @@ public class AccountController {
     @Autowired
     private TrasactionService trasactionService;
 
+    @Autowired
+    private HttpSanitizer httpSanitizer;
+
     @GetMapping(value = "/api/v1/owners/{userId}/accounts", produces= MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public ResponseEntity<Object> getOwnerAccounts(@PathVariable String userId){
-        CollectionModel<AccountResponse> response = accountService.getOwnerAccountList(userId);
+        String sanitizedUserId = httpSanitizer.sanitizer(userId);
+        CollectionModel<AccountResponse> response = accountService.getOwnerAccountList(sanitizedUserId);
         return new ResponseEntity<>(response, HttpStatus.ACCEPTED);
     }
 
     @GetMapping(value = "/api/v1/owners/{accountId}/transactions", produces= MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public ResponseEntity<Object> getTransactions(@PathVariable String accountId){
+        String sanitizedAccountId = httpSanitizer.sanitizer(accountId);
         CollectionModel<TransactionResponse> response = trasactionService.getTransactionList(accountId);
         return new ResponseEntity<>(response, HttpStatus.ACCEPTED);
     }

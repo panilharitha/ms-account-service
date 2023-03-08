@@ -22,6 +22,12 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>("Transaction not found", HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler(value = IllegalArgumentException.class)
+    public ResponseEntity<Object> handleValidationException(Exception exception) {
+        logException(exception, true);
+        return new ResponseEntity<>("Bad request", HttpStatus.BAD_REQUEST);
+    }
+
     private void logException(Throwable exception, boolean error){
         if (error) {
             log.error("message:\"Account infor service excountered an exception\", exception=", exception);

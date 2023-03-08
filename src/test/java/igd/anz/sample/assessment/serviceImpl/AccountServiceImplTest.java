@@ -1,6 +1,8 @@
 package igd.anz.sample.assessment.serviceImpl;
 
 
+import igd.anz.sample.assessment.exception.AccountNotFoundException;
+import org.junit.jupiter.api.Assertions;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import igd.anz.sample.assessment.api.AccountResponse;
@@ -20,11 +22,10 @@ import org.mockito.Mock;
 import org.mockito.quality.Strictness;
 import org.springframework.hateoas.CollectionModel;
 
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
+import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
@@ -51,7 +52,7 @@ public class AccountServiceImplTest {
     }
 
     @Test
-    void getOwnerAccountListSuccess(){
+    void getOwnerAccountList_SuccessWithValiedUserId(){
 
         Optional<List<Account>> dbReturn = Optional.of(Arrays.asList(Account.builder().build()));
         List<AccountResponse> mapperReturn = Arrays.asList(buildAccountResponse(
@@ -67,6 +68,25 @@ public class AccountServiceImplTest {
         verify(accountMapper, times(1)).maptoAccountResponse(any());
         assertEquals(response.getContent().stream().findFirst().get().getAccountName(),"Test Account");
         assertEquals(response.getContent().stream().findFirst().get().getAccountNumber(),"1");
+    }
+
+    @Test
+    void getOwnerAccountList_AccountNotFoundExceptionForInvalidUserId(){
+
+        Optional<List<Account>> dbReturn = Optional.of(new ArrayList<>());
+
+        when(accountRepository.findByUser_UserId(anyLong())).thenReturn(dbReturn);
+
+        AccountNotFoundException exception = assertThrows(
+                AccountNotFoundException.class, () -> accountService.getOwnerAccountList("1"));
+
+        assertAll("exception",
+                () -> {
+                    Assertions.assertNotNull(exception);
+                    Assertions.assertEquals(exception.getClass(), AccountNotFoundException.class);
+                    Assertions.assertEquals("Account not found for given user id", exception.getApiError().getMessage());
+                }
+        );
     }
 
     private Account buildAccount(Long accountId, String accountName, String accountNumber, AccountType accountType, Date balanceDate, double opaningBalance, Currency currency){
